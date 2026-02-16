@@ -30,6 +30,22 @@ find_package(pcl_conversions REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+if (NOT ARCHITECTURE_ID MATCHES "^(X86|x86)\_64$" )
+    message(WARNING "Adjusting or-tools...")
+    if (EXISTS $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296)
+        message(WARNING "Copying or-tools from HOME..." )
+        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/include DESTINATION ${CMAKE_CURRENT_LIST_DIR} src/tare_planner/or-tools)
+        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/lib DESTINATION ${CMAKE_CURRENT_LIST_DIR} src/tare_planner/or-tools)
+    else()
+        message(ERROR "or-tools not found, downloading..." )
+        add_custom_command(
+            OUTPUT ${CMAKE_SOURCE_DIR}/get_or_tools_arm.sh
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND bash
+        )
+    endif()
+endif()
+
  include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
