@@ -15,6 +15,22 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+if (NOT ARCHITECTURE_ID MATCHES "^(X86|x86)\_64$" )
+    message(WARNING "Adjusting or-tools for ARM...")
+    if (EXISTS $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296)
+        message(WARNING "Copying or-tools from HOME..." )
+        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/include DESTINATION ${CMAKE_CURRENT_LIST_DIR}/or-tools)
+        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/lib DESTINATION ${CMAKE_CURRENT_LIST_DIR}/or-tools)
+    else()
+        message(ERROR "or-tools not found, downloading..." )
+        execute_process(
+            OUTPUT_VARIABLE $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMAND bash ${CMAKE_SOURCE_DIR}/get_or_tools_arm.sh
+        )
+    endif()
+endif()
+
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
@@ -30,23 +46,7 @@ find_package(pcl_conversions REQUIRED)
 find_package(pcl_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-if (NOT ARCHITECTURE_ID MATCHES "^(X86|x86)\_64$" )
-    message(WARNING "Adjusting or-tools for ARM...")
-    if (EXISTS $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296)
-        message(WARNING "Copying or-tools from HOME..." )
-        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/include DESTINATION ${CMAKE_CURRENT_LIST_DIR}/or-tools)
-        file(COPY $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296/lib DESTINATION ${CMAKE_CURRENT_LIST_DIR}/or-tools)
-    else()
-        message(ERROR "or-tools not found, downloading..." )
-        add_custom_command(
-            OUTPUT ${CMAKE_SOURCE_DIR}/get_or_tools_arm.sh
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-            COMMAND bash
-        )
-    endif()
-endif()
-
- include_directories(
+include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
   include
