@@ -15,6 +15,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+cmake_host_system_information(RESULT ARCHITECTURE_ID QUERY OS_PLATFORM)
 if (NOT ARCHITECTURE_ID MATCHES "^(X86|x86)\_64$" )
     message(WARNING "Adjusting or-tools for ARM...")
     if (EXISTS $ENV{HOME}/or-tools_aarch64_Debian-11_cpp_v9.8.3296)
